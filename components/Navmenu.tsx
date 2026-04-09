@@ -21,7 +21,7 @@ import Axios from "./Axios";
 const Navmenu = () => {
   const dispatch = useDispatch();
   const { status } = useSession();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.user);
   const { navitems } = useSelector((state: RootState) => state.home);
   
 
@@ -287,10 +287,10 @@ const Navmenu = () => {
             <span className="text-gray-800">Payment Methods</span>
           </Link>
 
-          <Link
+          {isAuthenticated === false && <Link
             href="#"
             className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
-            onClick={async() => {
+            onClick={async () => {
               await signOut();
             }}
           >
@@ -298,7 +298,7 @@ const Navmenu = () => {
               <FiLogOut className="text-gray-600" size={16} />
             </div>
             <span className="text-gray-800">Logout</span>
-          </Link>
+          </Link>}
 
         </div>
       </div>
@@ -344,21 +344,7 @@ const Navmenu = () => {
         </div>
       </div>
 
-      {/* Logout Button (only show if logged in) */}
-      {isLoggedIn && (
-        <div className="px-2">
-          <button
-            onClick={() => {
-              // Handle logout logic here
-              handleCloseDrawer();
-            }}
-            className="flex items-center justify-center space-x-2 w-full p-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-          >
-            <FaSignOutAlt />
-            <span className="font-medium">Logout</span>
-          </button>
-        </div>
-      )}
+    
 
       {/* Footer Links */}
       <div className="mt-8 pt-6 border-t border-gray-200 px-2">
