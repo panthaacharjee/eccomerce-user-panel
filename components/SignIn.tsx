@@ -75,7 +75,7 @@ const SignIn = () => {
         duration: 0.2,
       },
     },
-  };
+  } as const
 
   // Fade in/out variants
   const fadeVariants = {
