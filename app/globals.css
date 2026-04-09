@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "daisyui";
+
 
 :root {
   --background: #ffffff;
@@ -23,4 +25,62 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* .input {
+  @apply flex items-center gap-2 border border-gray-800 rounded-lg px-4 py-2;
+}
+
+.input input {
+  @apply bg-transparent focus:outline-none w-full;
+} */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fixed.inset-0 {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+body:has(.fixed.inset-0) {
+  overflow: hidden;
+}
+
+.transition-colors {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.transition-transform {
+  transition: transform 0.2s ease;
+}
+
+.lg\:hidden {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.lg\:hidden[style*="display: block"] {
+  max-height: 100vh;
 }
