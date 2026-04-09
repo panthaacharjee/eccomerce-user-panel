@@ -83,7 +83,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       // ✅ Add user id to session
       if (session.user) {
-        session.user.id = token.id;
+        session.user.id = token.sessionToken; 
         session.user.email = token.email;
         session.user.name = token.name;
       }

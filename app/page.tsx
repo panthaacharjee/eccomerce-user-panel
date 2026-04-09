@@ -31,7 +31,7 @@ export default function Home() {
 
   // Filter out items with invalid src (with proper type checking)
   const image = category
-    .filter((val) => {
+    .filter((val:any) => {
       // Check if category_image exists and is a string with content
       return (
         val.category_image &&
