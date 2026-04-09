@@ -1,21 +1,37 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AlertCircle, XCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const ErrorPage = () => {
     const router = useRouter();
     const [countdown, setCountdown] = useState(5);
+    const [previousPage, setPreviousPage] = useState<string>('/signin');
 
     useEffect(() => {
+        // Get the previous page from session storage or referrer
+        const referrer = document.referrer;
+        const storedPage = sessionStorage.getItem('previousPage');
+
+        if (storedPage) {
+            setPreviousPage(storedPage);
+        } else if (referrer && referrer.includes(window.location.hostname)) {
+            setPreviousPage(referrer);
+        }
+
         // Auto redirect after 5 seconds
         const timer = setInterval(() => {
             setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    router.push('/');
+                    // Go back to previous page or sign in page
+                    if (document.referrer) {
+                        router.back();
+                    } else {
+                        router.push('/signin');
+                    }
                     return 0;
                 }
                 return prev - 1;
@@ -25,10 +41,15 @@ const ErrorPage = () => {
         return () => clearInterval(timer);
     }, [router]);
 
+    const handleTryAgain = () => {
+        // Store the current page before going back
+        sessionStorage.setItem('previousPage', window.location.href);
+        router.back();
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
-                {/* Animated Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -85,7 +106,6 @@ const ErrorPage = () => {
                             </p>
                         </motion.div>
 
-                        {/* Animated Alert */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
@@ -113,7 +133,7 @@ const ErrorPage = () => {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => router.back()}
+                                onClick={handleTryAgain}
                                 className="w-full flex items-center justify-center gap-2 bg-black text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-800 transition-all"
                             >
                                 <RefreshCw className="h-4 w-4" />
@@ -138,7 +158,7 @@ const ErrorPage = () => {
                             transition={{ delay: 0.8 }}
                             className="text-xs text-gray-500 mt-6"
                         >
-                            Redirecting to home page in {countdown} seconds...
+                            Redirecting back in {countdown} seconds...
                         </motion.p>
                     </div>
                 </motion.div>
