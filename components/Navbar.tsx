@@ -72,6 +72,7 @@ const Navbar: React.FC = () => {
 
   const { user } = useSelector((state: RootState) => state.user);
   const { navitems } = useSelector((state: RootState) => state.home);
+  const { cartItems } = useSelector((state: RootState) => state.cart);
 
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
@@ -319,7 +320,7 @@ const Navbar: React.FC = () => {
                 >
                   <FaBagShopping size={22} />
                   <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    0
+                    {cartItems.length}
                   </span>
                 </label>
               </div>
