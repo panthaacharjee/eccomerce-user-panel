@@ -103,6 +103,19 @@ const handler = NextAuth({
         return true;
       }
 
+      try {
+
+        const { data } = Axios.post(`/login/auth`, {
+          email: profile?.email || user.email,
+          accountType: account.provider,
+        });
+        
+        user.sessionToken = data.user?.authentication.sessionToken;
+      } catch (err) {
+        console.log(err);
+      }
+
+
       if (user.sessionToken) {
         return user;
       } else {
