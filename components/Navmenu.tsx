@@ -177,7 +177,7 @@ const Navmenu = () => {
         </h3>
         <div className="grid grid-cols-2 gap-3 px-2">
           <Link
-            href="/new-arrivals"
+            href="#"
             className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
             onClick={handleCloseDrawer}
           >
@@ -190,7 +190,7 @@ const Navmenu = () => {
           </Link>
 
           <Link
-            href="/sale"
+            href="#"
             className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
             onClick={handleCloseDrawer}
           >
@@ -201,7 +201,7 @@ const Navmenu = () => {
           </Link>
 
           <Link
-            href="/best-sellers"
+            href="#"
             className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
             onClick={handleCloseDrawer}
           >
@@ -214,7 +214,7 @@ const Navmenu = () => {
           </Link>
 
           <Link
-            href="/trending"
+            href="#"
             className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
             onClick={handleCloseDrawer}
           >
