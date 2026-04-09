@@ -326,7 +326,8 @@ export default function OrderPage() {
 
     try {
       dispatch(createOrderRequest());
-      const token = (session?.user as any)?.id || localStorage.getItem("auth-token") || "";
+      const token = session?.user?.id || "";
+      console.log(token)
 
 
       const { data } = await Axios.post("/order/create", orderData, {

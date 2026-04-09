@@ -19,7 +19,8 @@ const UserProvider = ({ children }: Props) => {
   const dispatch = useDispatch();
 
   const { data: session, status } = useSession();
-  console.log(session)
+  const {user} = useSelector((state: RootState) => state.user);
+  console.log(user)
 
   const getUser = async () => {
     try {
