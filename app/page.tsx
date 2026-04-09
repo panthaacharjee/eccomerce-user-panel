@@ -18,10 +18,15 @@ import {
 import { useEffect } from "react";
 import Axios from "@/components/Axios";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const dispatch = useDispatch();
   const { category } = useSelector((state: RootState) => state.home);
+
+  const {data:session} = useSession();
+
+  console.log(session)
 
   const formatForUrl = (text: string): string => {
     return text.toLowerCase().replace(/\s+/g, '-');
