@@ -138,7 +138,7 @@ const ErrorPage = () => {
                             transition={{ delay: 0.8 }}
                             className="text-xs text-gray-500 mt-6"
                         >
-                            Redirecting to sign in page in {countdown} seconds...
+                            Redirecting to home page in {countdown} seconds...
                         </motion.p>
                     </div>
                 </motion.div>
