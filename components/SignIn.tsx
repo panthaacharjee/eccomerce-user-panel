@@ -54,7 +54,7 @@ const SignIn = () => {
           toast.error("No account found with this email. Please sign up first.");
           // Optional: Redirect to signup after 2 seconds
           setTimeout(() => {
-            router.push("/signup");
+            router.push("/create/account");
           }, 2000);
         } else if (errorMessage.includes("Network error")) {
           toast.error("Network error. Please check your connection.");
@@ -364,7 +364,7 @@ const SignIn = () => {
                   <button
                     type="button"
                     className="font-medium text-black hover:underline transition-colors ml-1"
-                    onClick={() => router.push("/signup")}
+                    onClick={() => router.push("/create/account")}
                   >
                     Sign up
                   </button>
