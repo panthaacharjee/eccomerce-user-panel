@@ -2,12 +2,51 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, XCircle, RefreshCw, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { AlertCircle, XCircle, RefreshCw, ArrowLeft, Mail, Lock } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const ErrorPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const error = searchParams.get('error');
     const [countdown, setCountdown] = useState(5);
+
+    // Get error message based on error type
+    const getErrorMessage = () => {
+        switch (error) {
+            case 'CredentialsSignin':
+                return {
+                    title: 'Invalid Credentials',
+                    message: 'The email or password you entered is incorrect.',
+                    details: 'Please check your credentials and try again.'
+                };
+            case 'AccessDenied':
+                return {
+                    title: 'Access Denied',
+                    message: 'You do not have permission to sign in.',
+                    details: 'Please contact support if you believe this is an error.'
+                };
+            case 'OAuthSignin':
+            case 'OAuthCallback':
+            case 'OAuthCreateAccount':
+            case 'EmailCreateAccount':
+            case 'Callback':
+                return {
+                    title: 'Authentication Failed',
+                    message: 'There was a problem with the authentication service.',
+                    details: 'Please try again or use a different sign-in method.'
+                };
+            case 'Default':
+            default:
+                return {
+                    title: 'Sign In Failed',
+                    message: 'Invalid email or password.',
+                    details: 'Please check your credentials and try again.'
+                };
+        }
+    };
+
+    const errorInfo = getErrorMessage();
 
     useEffect(() => {
         // Auto redirect after 5 seconds
@@ -78,10 +117,10 @@ const ErrorPage = () => {
                             transition={{ delay: 0.3 }}
                         >
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Sign In Failed
+                                {errorInfo.title}
                             </h1>
                             <p className="text-gray-600 mb-6">
-                                Invalid email or password. Please check your credentials and try again.
+                                {errorInfo.message}
                             </p>
                         </motion.div>
 
@@ -95,17 +134,36 @@ const ErrorPage = () => {
                                 damping: 20,
                                 delay: 0.5
                             }}
-                            className="bg-red-50 rounded-lg p-4 mb-6 flex items-center gap-3"
+                            className="bg-red-50 rounded-lg p-4 mb-6"
                         >
-                            <motion.div
-                                animate={{ rotate: [0, 10, -10, 0] }}
-                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                            >
-                                <AlertCircle className="h-5 w-5 text-red-500" />
-                            </motion.div>
-                            <p className="text-sm text-red-700">
-                                Please ensure your email and password are correct
-                            </p>
+                            <div className="flex items-center gap-3 mb-3">
+                                <motion.div
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                                >
+                                    <AlertCircle className="h-5 w-5 text-red-500" />
+                                </motion.div>
+                                <p className="text-sm text-red-700 font-medium">
+                                    {errorInfo.details}
+                                </p>
+                            </div>
+
+                            {/* Additional tips for invalid credentials */}
+                            {error === 'CredentialsSignin' && (
+                                <div className="mt-3 pt-3 border-t border-red-100">
+                                    <p className="text-xs text-red-600 mb-2">Common issues:</p>
+                                    <ul className="text-xs text-red-500 space-y-1 text-left">
+                                        <li className="flex items-center gap-2">
+                                            <Mail className="h-3 w-3" />
+                                            Check your email address spelling
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <Lock className="h-3 w-3" />
+                                            Ensure caps lock is off for password
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Action Buttons */}
@@ -123,7 +181,7 @@ const ErrorPage = () => {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => router.push('/signin')}
+                                onClick={() => router.push('/')}
                                 className="w-full flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:border-black hover:text-black transition-all"
                             >
                                 <ArrowLeft className="h-4 w-4" />

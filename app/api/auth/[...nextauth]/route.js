@@ -1,3 +1,4 @@
+// app/api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
@@ -9,65 +10,86 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_ID || "",
       clientSecret: process.env.GOOGLE_SECRET || "",
-      httpOptions: {
-        timeout: 10000,
-      },
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
-      httpOptions: {
-        timeout: 10000,
-      },
     }),
-
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        firstName: { label: "firstName", type: "text" },
-        lastName: { label: "lastName", type: "text" },
         email: { label: "email", type: "text" },
         password: { label: "password", type: "password" },
         type: { label: "Type", type: "text" },
       },
       async authorize(credentials) {
-        console.log(credentials);
-        if (credentials?.type === "Register") {
-          const { data } = await Axios.post("/register/user", credentials);
+        try {
+          console.log("Authorize called with:", {
+            email: credentials?.email,
+            type: credentials?.type
+          });
 
-          let user = data.user;
-          user.sessionToken = data.user?.authentication.sessionToken;
-          // ✅ Add id to user object
-          user.id = user._id || user.id;
-          return user || null;
-        } else {
-          const { data } = await Axios.post("/login/user", credentials);
-          console.log(data);
-          let user = data.user;
-          user.sessionToken = data.user?.authentication.sessionToken;
-          // ✅ Add id to user object
-          user.id = user._id || user.id;
-          return user || null;
+          if (credentials?.type === "Register") {
+            const { data } = await Axios.post("/register/user", credentials);
+
+            if (!data || !data.user) {
+              throw new Error("Registration failed");
+            }
+
+            let user = data.user;
+            user.sessionToken = data.user?.authentication?.sessionToken;
+            user.id = user._id || user.id;
+
+            return user || null;
+          } else {
+            // Login flow
+            const { data } = await Axios.post("/login/user", {
+              email: credentials.email,
+              password: credentials.password
+            });
+
+            console.log("Login response:", data);
+
+            if (!data || !data.user) {
+              throw new Error("Invalid email or password");
+            }
+
+            let user = data.user;
+            user.sessionToken = data.user?.authentication?.sessionToken;
+            user.id = user._id || user.id;
+
+            return user;
+          }
+        } catch (error) {
+          console.error("Authorization error:", error);
+
+          if (error.response) {
+            if (error.response.status === 401) {
+              throw new Error("Invalid email or password");
+            }
+            throw new Error(error.response.data?.message || "Authentication failed");
+          }
+
+          throw new Error(error.message || "Authentication failed");
         }
       },
     }),
   ],
-  
+
   callbacks: {
-    async signIn({ user, profile, account }) {
+    async signIn({ user, account }) {
       if (account?.provider === "credentials") {
         return true;
       }
 
-      if (user.sessionToken) {
-        return user;
-      } else {
-        return false;
+      if (user && user.email) {
+        return true;
       }
+
+      return false;
     },
 
     async jwt({ token, user, account }) {
-      // ✅ Add user id to token
       if (user) {
         token.id = user.id;
         token.sessionToken = user.sessionToken;
@@ -81,7 +103,6 @@ const handler = NextAuth({
     },
 
     async session({ session, token }) {
-      // ✅ Add user id to session
       if (session.user) {
         session.user.id = token.id;
         session.user.email = token.email;
@@ -94,39 +115,30 @@ const handler = NextAuth({
 
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  jwt: {
-    secret: process.env.AUTH_SECRET,
-    maxAge: 60 * 60,
-  },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
   pages: {
     signIn: "/",
     error: "/auth/error",
   },
+
   cookies: {
     sessionToken: {
       name: "next-auth.session-token",
       options: {
         httpOnly: true,
-        sameSite: "lax", // Changed from "None" for better compatibility
-        path: "/",
-        secure: process.env.NODE_ENV === "production", // Only secure in production
-      },
-    },
-  }, cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax", // Change from "none" for production
+        sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
       },
     },
   },
-  // Important for Vercel
+
   useSecureCookies: process.env.NODE_ENV === "production",
+  debug: process.env.NODE_ENV === "development",
 });
 
 export { handler as GET, handler as POST };
