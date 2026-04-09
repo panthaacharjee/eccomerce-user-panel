@@ -185,7 +185,7 @@ const ErrorPage = () => {
                                 className="w-full flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:border-black hover:text-black transition-all"
                             >
                                 <ArrowLeft className="h-4 w-4" />
-                                Back to Sign In
+                                Back to home page
                             </motion.button>
                         </div>
 

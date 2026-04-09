@@ -26,6 +26,7 @@ import { RootState } from "@/redux/rootReducer";
 import { GetNavItemFail, GetNavItemRequest, GetNavItemSuccess } from "@/redux/reducers/homeReducer";
 import Axios from "./Axios";
 import Image from "next/image";
+import { FaSearch } from "react-icons/fa";
 
 // Type definitions from your interfaces
 interface SubLabel {
@@ -271,7 +272,7 @@ const Navbar: React.FC = () => {
                   type="submit"
                   className="ml-2 p-2 bg-black text-white rounded-lg"
                 >
-                  <FaXmark size={18} />
+                  <FaSearch size={18} />
                 </button>
               </form>
             </div>
@@ -288,7 +289,7 @@ const Navbar: React.FC = () => {
                   onClick={toggleSearch}
                   className="text-xl text-gray-800"
                 >
-                  <FaXmark />
+                  <FaSearch />
                 </button>
               </div>
 

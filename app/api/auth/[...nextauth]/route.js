@@ -37,7 +37,6 @@ const handler = NextAuth({
 
           let user = data.user;
           user.sessionToken = data.user?.authentication.sessionToken;
-          // ✅ Add id to user object
           user.id = user._id || user.id;
           return user || null;
         } else {
