@@ -9,8 +9,10 @@ import { clearError, clearSuccess, createOrderFail, createOrderRequest, createOr
 import Axios from "@/components/Axios";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function OrderPage() {
+  const router  = useRouter();
   const dispatch = useDispatch();
   const { data: session } = useSession();
 
@@ -381,6 +383,12 @@ export default function OrderPage() {
     dispatch(clearSuccess())
     dispatch(clearError())
   },[success, error])
+
+  useEffect(() => {
+    if(success){
+      return router.push("/");
+    }
+  }, [success]);
 
 
 
