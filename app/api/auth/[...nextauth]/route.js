@@ -5,7 +5,7 @@ import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Axios from "../../../../components/Axios";
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID || "",
@@ -28,6 +28,10 @@ const handler = NextAuth({
             email: credentials?.email,
             type: credentials?.type
           });
+
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password are required");
+          }
 
           if (credentials?.type === "Register") {
             const { data } = await Axios.post("/register/user", credentials);
@@ -125,20 +129,13 @@ const handler = NextAuth({
     error: "/auth/error",
   },
 
-  cookies: {
-    sessionToken: {
-      name: "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
+  // Remove custom cookies configuration for Vercel
+  // Let NextAuth handle cookies automatically
 
   useSecureCookies: process.env.NODE_ENV === "production",
   debug: process.env.NODE_ENV === "development",
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
