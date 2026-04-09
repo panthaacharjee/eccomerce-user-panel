@@ -147,7 +147,7 @@ const SignUp: React.FC = () => {
   }, [status, router]);
 
   return (
-    <div className="max-w-md mx-auto w-full space-y-14">
+    <div className="max-w-md mx-auto w-full space-y-8 mt-10">
       {/* Header */}
       <motion.div
         variants={fadeVariants}
