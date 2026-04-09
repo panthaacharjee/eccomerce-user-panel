@@ -113,10 +113,10 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
             {(image.title || image.description) && (
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                 {image.title && (
-                  <h3 className="text-2xl font-bold mb-2">{image.title}</h3>
+                  <h3 className="text-sm lg:text-2xl font-bold mb-2">{image.title}</h3>
                 )}
                 {image.description && (
-                  <p className="text-lg opacity-90">{image.description}</p>
+                  <p className="text-xs lg:text-lg opacity-90">{image.description}</p>
                 )}
               </div>
             )}
