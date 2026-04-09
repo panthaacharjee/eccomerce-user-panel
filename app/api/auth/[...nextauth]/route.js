@@ -102,6 +102,7 @@ const handler = NextAuth({
   },
   pages: {
     signIn: "/",
+    error: "/auth/error",
   },
   cookies: {
     sessionToken: {
