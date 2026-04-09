@@ -287,7 +287,7 @@ const Navmenu = () => {
             <span className="text-gray-800">Payment Methods</span>
           </Link>
 
-          {isAuthenticated === false && <Link
+          {isAuthenticated === true && user && <Link
             href="#"
             className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
             onClick={async () => {
