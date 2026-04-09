@@ -105,7 +105,7 @@ const handler = NextAuth({
 
       try {
 
-        const { data } = Axios.post(`/login/auth`, {
+        const { data } = await Axios.post(`/login/auth`, {
           email: profile?.email || user.email,
           accountType: account.provider,
         });

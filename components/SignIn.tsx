@@ -318,7 +318,7 @@ const SignIn = () => {
               >
                 <button
                   type="button"
-                  onClick={() => signIn("google", { callbackUrl: "/" })}
+                  onClick={() => signIn("google")}
                   className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 outline-none cursor-pointer transition-colors"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
