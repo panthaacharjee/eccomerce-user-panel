@@ -446,7 +446,7 @@ export default function OrderPage() {
                         formErrors.firstName ? "border-red-500" : "border-gray-400"
                       }`}
                       placeholder="John"
-                      disabled={isAuthenticated}
+                      
                     />
                     {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
                   </div>
@@ -463,7 +463,7 @@ export default function OrderPage() {
                         formErrors.lastName ? "border-red-500" : "border-gray-400"
                       }`}
                       placeholder="Doe"
-                      disabled={isAuthenticated}
+                      
                     />
                     {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
                   </div>
