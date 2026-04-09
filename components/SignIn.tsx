@@ -67,7 +67,6 @@ const SignIn = () => {
 
         // Redirect to home after short delay
         setTimeout(() => {
-          router.push("/");
           router.refresh();
         }, 1500);
       }
