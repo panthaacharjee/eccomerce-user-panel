@@ -111,6 +111,15 @@ const handler = NextAuth({
         });
         
         user.sessionToken = data.user?.authentication.sessionToken;
+
+        // Validate we got the token
+        if (!user.sessionToken) {
+          console.error("No session token received from /login/auth", data);
+          return false; // Reject the sign in
+        }
+
+        return true;
+
       } catch (err) {
         console.log(err);
       }
@@ -128,7 +137,6 @@ const handler = NextAuth({
         token.id = user.id;
         token.sessionToken = user.sessionToken;
         token.email = user.email;
-        token.name = user.name;
       }
       if (account) {
         token.accessToken = account.access_token;
@@ -140,7 +148,6 @@ const handler = NextAuth({
       if (session.user) {
         session.user.id = token.sessionToken;
         session.user.email = token.email;
-        session.user.name = token.name;
       }
       session.accessToken = token.accessToken;
       return session;
