@@ -127,11 +127,6 @@ const SignIn = () => {
     },
   };
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
 
   return (
     <div className="mx-auto w-full overflow-hidden">
