@@ -112,13 +112,7 @@ const handler = NextAuth({
         
         user.sessionToken = data.user?.authentication.sessionToken;
 
-        // Validate we got the token
-        if (!user.sessionToken) {
-          console.error("No session token received from /login/auth", data);
-          return false; // Reject the sign in
-        }
-
-        return true;
+        return !!user.sessionToken;
 
       } catch (err) {
         console.log(err);
