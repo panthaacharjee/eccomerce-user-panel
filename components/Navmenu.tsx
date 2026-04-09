@@ -11,7 +11,8 @@ import {
   FaCreditCard,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import { FiLogOut } from "react-icons/fi";
+import { signOut, useSession } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/rootReducer";
 import { GetNavItemFail, GetNavItemRequest, GetNavItemSuccess } from "@/redux/reducers/homeReducer";
@@ -232,7 +233,7 @@ const Navmenu = () => {
         </h3>
         <div className="space-y-1 px-2">
           <Link
-            href="/account"
+            href="/profile/me"
             className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
             onClick={handleCloseDrawer}
           >
@@ -285,6 +286,20 @@ const Navmenu = () => {
             </div>
             <span className="text-gray-800">Payment Methods</span>
           </Link>
+
+          <Link
+            href="#"
+            className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={async() => {
+              await signOut();
+            }}
+          >
+            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+              <FiLogOut className="text-gray-600" size={16} />
+            </div>
+            <span className="text-gray-800">Logout</span>
+          </Link>
+
         </div>
       </div>
 
