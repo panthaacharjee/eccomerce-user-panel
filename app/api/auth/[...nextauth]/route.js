@@ -1,3 +1,5 @@
+// pages/api/auth/[...nextauth].js or app/api/auth/[...nextauth]/route.js
+
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
@@ -31,27 +33,70 @@ const handler = NextAuth({
         type: { label: "Type", type: "text" },
       },
       async authorize(credentials) {
-        console.log(credentials);
-        if (credentials?.type === "Register") {
-          const { data } = await Axios.post("/register/user", credentials);
+        try {
+          console.log(credentials);
 
-          let user = data.user;
-          user.sessionToken = data.user?.authentication.sessionToken;
-          user.id = user._id || user.id;
-          return user || null;
-        } else {
-          const { data } = await Axios.post("/login/user", credentials);
-          console.log(data);
-          let user = data.user;
-          user.sessionToken = data.user?.authentication.sessionToken;
-          // ✅ Add id to user object
-          user.id = user._id || user.id;
-          return user || null;
+          if (credentials?.type === "Register") {
+            try {
+              const { data } = await Axios.post("/register/user", credentials);
+
+              let user = data.user;
+              user.sessionToken = data.user?.authentication.sessionToken;
+              user.id = user._id || user.id;
+              return user || null;
+            } catch (error) {
+              // Handle registration errors
+              if (error.response) {
+                const { status, data } = error.response;
+
+                if (status === 409 || data.message?.includes("exist")) {
+                  throw new Error("User already exists with this email");
+                } else if (status === 400) {
+                  throw new Error(data.message || "Invalid registration data");
+                } else {
+                  throw new Error(data.message || "Registration failed");
+                }
+              }
+              throw new Error("Network error during registration");
+            }
+          } else {
+            try {
+              const { data } = await Axios.post("/login/user", credentials);
+              console.log(data);
+
+              // Check if login was successful
+              if (!data.user) {
+                throw new Error("Invalid email or password");
+              }
+
+              let user = data.user;
+              user.sessionToken = data.user?.authentication.sessionToken;
+              user.id = user._id || user.id;
+              return user;
+            } catch (error) {
+              // Handle login errors
+              if (error.response) {
+                const { status, data } = error.response;
+
+                if (status === 401) {
+                  throw new Error("Invalid email or password");
+                } else if (status === 404) {
+                  throw new Error("User not found");
+                } else {
+                  throw new Error(data.message || "Login failed");
+                }
+              }
+              throw new Error("Network error during login");
+            }
+          }
+        } catch (error) {
+          // Throw the error to be caught by NextAuth
+          throw new Error(error.message);
         }
       },
     }),
   ],
-  
+
   callbacks: {
     async signIn({ user, profile, account }) {
       if (account?.provider === "credentials") {
@@ -66,7 +111,6 @@ const handler = NextAuth({
     },
 
     async jwt({ token, user, account }) {
-      // ✅ Add user id to token
       if (user) {
         token.id = user.id;
         token.sessionToken = user.sessionToken;
@@ -80,9 +124,8 @@ const handler = NextAuth({
     },
 
     async session({ session, token }) {
-      // ✅ Add user id to session
       if (session.user) {
-        session.user.id = token.sessionToken; 
+        session.user.id = token.sessionToken;
         session.user.email = token.email;
         session.user.name = token.name;
       }
@@ -101,20 +144,19 @@ const handler = NextAuth({
   },
   pages: {
     signIn: "/",
-    error: "/auth/error",
+    error: "/auth/error", // NextAuth will redirect here with error param
   },
   cookies: {
     sessionToken: {
       name: "next-auth.session-token",
       options: {
         httpOnly: true,
-        sameSite: "lax", // Changed from "None" for better compatibility
+        sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production", // Only secure in production
+        secure: process.env.NODE_ENV === "production",
       },
     },
-  }, 
-  // Important for Vercel
+  },
   useSecureCookies: process.env.NODE_ENV === "production",
 });
 

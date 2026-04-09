@@ -1,9 +1,11 @@
+// components/SignIn.tsx
 import React, { useEffect, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import ForgotPassword from "./ForgotPassword";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 type AuthView = "signin" | "forgot-password";
 
@@ -13,12 +15,12 @@ const SignIn = () => {
 
   const [authView, setAuthView] = useState<AuthView>("signin");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -32,13 +34,49 @@ const SignIn = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      type: "Login",
-    });
-    // Simulate API call
-    // setIsSubmitting(false);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+        type: "Login",
+      });
+
+      console.log("SignIn result:", result);
+
+      if (result?.error) {
+        // Handle different error messages
+        const errorMessage = result.error;
+
+        if (errorMessage.includes("Invalid email or password")) {
+          toast.error("Invalid email or password. Please try again.");
+        } else if (errorMessage.includes("User not found")) {
+          toast.error("No account found with this email. Please sign up first.");
+          // Optional: Redirect to signup after 2 seconds
+          setTimeout(() => {
+            router.push("/signup");
+          }, 2000);
+        } else if (errorMessage.includes("Network error")) {
+          toast.error("Network error. Please check your connection.");
+        } else {
+          toast.error(errorMessage || "Authentication failed. Please try again.");
+        }
+      } else if (result?.ok) {
+        // Success!
+        toast.success("Login successful! Redirecting...");
+
+        // Redirect to home after short delay
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("SignIn error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -53,10 +91,10 @@ const SignIn = () => {
     setAuthView("signin");
   };
 
-  // Updated slideVariants - both come from right and exit to right
+  // Slide variants
   const slideVariants = {
     initial: {
-      x: 100, // Always come from the right
+      x: 100,
       opacity: 0,
     },
     animate: {
@@ -69,15 +107,14 @@ const SignIn = () => {
       },
     },
     exit: {
-      x: 100, // Also exit to the right
+      x: 100,
       opacity: 0,
       transition: {
         duration: 0.2,
       },
     },
-  } as const
+  }as const;
 
-  // Fade in/out variants
   const fadeVariants = {
     initial: { opacity: 0 },
     animate: {
@@ -94,7 +131,7 @@ const SignIn = () => {
     if (status === "authenticated") {
       router.push("/");
     }
-  }, [status]);
+  }, [status, router]);
 
   return (
     <div className="mx-auto w-full overflow-hidden">
@@ -201,7 +238,7 @@ const SignIn = () => {
                   </div>
                 </motion.div>
 
-                {/* Remember Me & Submit */}
+                {/* Remember Me */}
                 <motion.div
                   variants={fadeVariants}
                   className="flex items-center justify-between"
@@ -229,11 +266,10 @@ const SignIn = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg text-white font-medium ${
-                      isSubmitting
+                    className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg text-white font-medium ${isSubmitting
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-black hover:opacity-90 transition-opacity"
-                    }`}
+                      }`}
                   >
                     {isSubmitting ? (
                       <>
@@ -288,6 +324,7 @@ const SignIn = () => {
               >
                 <button
                   type="button"
+                  onClick={() => signIn("google", { callbackUrl: "/" })}
                   className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 outline-none cursor-pointer transition-colors"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -312,6 +349,7 @@ const SignIn = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={() => signIn("github", { callbackUrl: "/" })}
                   className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 outline-none cursor-pointer transition-colors"
                 >
                   <svg
@@ -332,7 +370,7 @@ const SignIn = () => {
                   <button
                     type="button"
                     className="font-medium text-black hover:underline transition-colors ml-1"
-                    onClick={() => router.push("/create/account")}
+                    onClick={() => router.push("/signup")}
                   >
                     Sign up
                   </button>

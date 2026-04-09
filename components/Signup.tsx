@@ -1,3 +1,4 @@
+// components/SignUp.tsx
 import React, { useEffect, useState } from "react";
 import {
   Eye,
@@ -6,12 +7,13 @@ import {
   Lock,
   User,
   ArrowRight,
-  ArrowLeft,
 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
-const Signup: React.FC = () => {
+const SignUp: React.FC = () => {
   const { status } = useSession();
   const router = useRouter();
 
@@ -35,36 +37,90 @@ const Signup: React.FC = () => {
     }));
   };
 
+  const validateForm = () => {
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords don't match!");
+      return false;
+    }
+
+    // Check password strength
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long!");
+      return false;
+    }
+
+    // Check if password has uppercase and number
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasNumber = /[0-9]/.test(formData.password);
+
+    if (!hasUpperCase || !hasNumber) {
+      toast.error("Password must contain at least one uppercase letter and one number!");
+      return false;
+    }
+
+    // Check terms agreement
+    if (!formData.agreeToTerms) {
+      toast.error("Please agree to the terms and conditions");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
-    }
-
-    if (!formData.agreeToTerms) {
-      alert("Please agree to the terms and conditions");
+    if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
 
-    signIn("credentials", {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password,
-      type: "Register",
-    });
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        type: "Register",
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Sign up attempt with:", formData);
+      console.log("SignUp result:", result);
+
+      if (result?.error) {
+        const errorMessage = result.error;
+
+        if (errorMessage.includes("User already exists")) {
+          toast.error("An account with this email already exists. Please sign in instead.");
+          // Redirect to signin after 2 seconds
+          setTimeout(() => {
+            router.push("/signin");
+          }, 2000);
+        } else if (errorMessage.includes("Invalid")) {
+          toast.error(errorMessage);
+        } else if (errorMessage.includes("Network error")) {
+          toast.error("Network error. Please check your connection.");
+        } else {
+          toast.error(errorMessage || "Registration failed. Please try again.");
+        }
+      } else if (result?.ok) {
+        // Success!
+        toast.success("Account created successfully! Redirecting to sign in...");
+
+        // Redirect to signin after short delay
+        setTimeout(() => {
+          router.push("/signin");
+          router.refresh();
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("SignUp error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      alert("Account created successfully! (This is a demo)");
-    }, 1500);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -75,25 +131,42 @@ const Signup: React.FC = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const fadeVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3 },
+    },
+  };
+
   useEffect(() => {
     if (status === "authenticated") {
-      return router.push("/");
+      router.push("/");
     }
-  }, [status]);
+  }, [status, router]);
 
   return (
-    <div className="max-w-md mx-auto w-full space-y-8 mt-10">
+    <div className="max-w-md mx-auto w-full space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-widest">
-          Create Account
-        </h2>
+      <motion.div
+        variants={fadeVariants}
+        initial="initial"
+        animate="animate"
+        className="text-center"
+      >
+        <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
         <p className="mt-2 text-sm text-gray-600">Join our community today</p>
-      </div>
+      </motion.div>
 
       {/* Form */}
-      <form className="mt-3 " onSubmit={handleSubmit}>
-        <div className="bg-white py-8 px-6 shadow-lg rounded-xl space-y-6">
+      <form className="mt-3" onSubmit={handleSubmit}>
+        <motion.div
+          variants={fadeVariants}
+          initial="initial"
+          animate="animate"
+          className="bg-white py-8 px-6 shadow-lg rounded-xl space-y-6"
+        >
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -278,11 +351,10 @@ const Signup: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg text-white font-medium ${
-              isSubmitting
+            className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg text-white font-medium ${isSubmitting
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-black hover:opacity-90 transition-opacity"
-            }`}
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -316,22 +388,23 @@ const Signup: React.FC = () => {
             )}
           </button>
 
-          {/* Already have account */}
+          {/* Sign In Link */}
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Already have an account?
+              Already have an account?{" "}
               <button
                 type="button"
+                onClick={() => router.push("/signin")}
                 className="font-medium text-black hover:underline transition-colors"
               >
                 Sign in here
               </button>
             </p>
           </div>
-        </div>
+        </motion.div>
       </form>
     </div>
   );
 };
 
-export default Signup;
+export default SignUp;
