@@ -336,7 +336,7 @@ const ShoppingCart: React.FC = () => {
 
   // Handle continue shopping
   const handleContinueShopping = (): void => {
-    router.push("/collections");
+    router.push("/");
   };
 
   // Get image URL for product
