@@ -247,6 +247,7 @@ const Navbar: React.FC = () => {
 
   return (
     <div className="relative">
+      <div className="w-full text-center bg-black text-white">This is my free hosting website. Please wait 30-60 seconds for the site to load first time.</div>
       {isTabletOrMobile && (
         <div className="bg-white border-b border-gray-200">
           {/* Search Bar (when open on mobile) */}
