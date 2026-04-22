@@ -247,8 +247,8 @@ const Navbar: React.FC = () => {
 
   return (
     <div className="relative">
-      <div className="w-full bg-black text-white py-2 overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap">
+      <div className="w-full bg-black text-white py-1 overflow-hidden">
+        <div className="animate-marquee whitespace-nowrap text-sm">
           This is my free hosting website. Please wait 30-60 seconds for the site to load first time.
         </div>
       </div>
