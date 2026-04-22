@@ -245,13 +245,24 @@ const Navbar: React.FC = () => {
     );
   };
 
+
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShow(false);
+    }, 60000); // 1 minute (60000 ms)
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="relative">
-      <div className="w-full bg-black text-white py-1 overflow-hidden">
+      {show && <div className="w-full bg-black text-white py-1 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap text-sm">
           This is my free hosting website. Please wait 30-60 seconds for the site to load first time.
         </div>
-      </div>
+      </div>}
       {isTabletOrMobile && (
         <div className="bg-white border-b border-gray-200">
           {/* Search Bar (when open on mobile) */}
